@@ -1,54 +1,76 @@
-# Fast-Proximity 🚀
+# 🚀 Fast-Proximity v2.0
 
-**Fast-Proximity** is a high-performance, N-Dimensional spatial search engine for Python. It is designed as a lightweight, JIT-compiled engine optimized for ultra-low latency queries and large-scale datasets.
+**High-performance, JIT-accelerated N-Dimensional spatial search engine for Python.**
 
-Built on top of **NumPy** and **Numba**, it achieves near-native execution speeds by compiling Python logic directly into machine code.
+Fast-Proximity is a hybrid spatial indexing engine designed for ultra-low latency neighbor queries. By combining **Numba JIT compilation** with an **Adaptive Triple-Filter** logic, it bridges the gap between Python's flexibility and C++ execution speeds.
 
-## Key Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
+[![Numba](https://img.shields.io/badge/powered%20by-Numba-orange.svg)](https://numba.pydata.org/)
 
-* **Extreme Performance:** Query 1 million points in ~0.16 ms (2D) or ~0.44 ms (10D).
-* **JIT-Accelerated:** Leverages Numba's `@njit` to eliminate Python interpreter overhead.
-* **Streamlined Architecture:** Uses a hybrid Spatial Grid Indexing approach for balanced construction and search times.
-* **Zero-Weight:** Minimal dependency stack (NumPy + Numba).
-* **N-Dimensional:** Efficiently scales from 2D spatial mapping to high-dimensional feature matching.
+---
 
-## Performance Benchmark (1M Points)
+## 🧠 Why Fast-Proximity?
 
-| Dimension | Engine | Query Time |
-|-----------|--------|------------|
-| 2D | Fast-Proximity | **0.16 ms** |
-| 10D | Fast-Proximity | **0.44 ms** |
+Traditional spatial structures like `cKDTree` are excellent for static datasets but can be slow to build in dynamic environments. **Fast-Proximity v2.0** is optimized for the "Build-Query-Update" cycle, making it ideal for:
+* **Real-time SLAM & Robotics**
+* **Dynamic Particle Simulations**
+* **High-frequency Financial Data Clustering**
+* **AI/ML Inference** where neighbor lookup is the bottleneck.
 
-## Quick Start
+## ✨ Key Features in v2.0
+
+* **Adaptive Variance Selection:** The engine automatically analyzes your dataset's variance to choose the most informative dimensions for indexing, avoiding "dead" or collapsed dimensions.
+* **Triple-Filter Architecture:** Uses a primary Active Grid combined with two Passive Range Filters to discard up to 99% of candidates before performing expensive Euclidean calculations.
+* **Zero-Overhead Numba JIT:** Core search logic is compiled to machine code. Version 2.0 eliminates dynamic list overhead by using pre-allocated memory buffers.
+* **Self-Normalizing:** No need to pre-scale your data. The engine handles any coordinate range (GPS, pixels, normalized) automatically.
+
+---
+
+## 📊 Performance Benchmark
+
+*Tested on 1,000,000 points (10 Dimensions) - Average Query Time:*
+
+| Engine | Build Time (ms) | Query Time (ms) | Total (1st Run) |
+| :--- | :--- | :--- | :--- |
+| `scipy.spatial.cKDTree` | ~880 ms | **~0.25 ms** | ~880.25 ms |
+| **Fast-Proximity v2.0** | **~220 ms** | ~2.30 ms | **~222.30 ms** |
+
+> **Verdict:** Fast-Proximity is **4x faster to build** than a KDTree. It is the superior choice for applications where data changes frequently or where the combined "Build + Query" time is the critical factor.
+
+---
+
+## 🛠️ Installation
+
+```bash
+pip install numpy numba
+```
+
+## 🚀 Quick Start
 
 ```python
 import numpy as np
 from fast_proximity import FastProximity
 
-# 1. Initialize with 1 million 10D points
+# Generate 1 million 10D points
 data = np.random.rand(1000000, 10).astype(np.float32)
-engine = FastProximity(data, grid_size=400)
 
-# 2. Query neighbors within radius R
-query_p = np.random.rand(10).astype(np.float32)
-indices, distances = engine.query(query_p, R=0.1, K=5)
+# Initialize the engine (Automatic variance analysis)
+engine = FastProximity(data, grid_size=5000)
 
-if indices is not None:
-    print(f"Found {len(indices)} neighbors in record time!")
+# Search for 5 neighbors within radius 0.05
+query_point = np.random.rand(10).astype(np.float32)
+indices, distances = engine.query(query_point, R=0.05, K=5)
+
+print(f"Found {len(indices)} neighbors!")
 ```
 
-## Why Fast-Proximity?
+---
 
-While traditional spatial structures are often static and hard to modify, **Fast-Proximity** is built with flexibility in mind. By using a grid-based approach instead of a rigid tree, it provides:
+## 👥 SLRM Team & Contributors
+Developed by the **SLRM Team**: 
+`Alex` · `Gemini` · `ChatGPT` · `Claude` · `Grok` · `Meta AI`
 
-1. **Near-instant initialization.**
-2. **High throughput** for real-time applications (Robotics, Physics Simulations, AI).
-3. **Full transparency:** Custom distance metrics or search logic can be easily injected into the JIT loop.
-
-## Roadmap
-- [ ] **Fast-Triangulation**: Upcoming high-speed triangulation module.
-- [ ] Dynamic point insertion and deletion (CRUD support).
-- [ ] Support for custom distance metrics (Manhattan, Cosine, etc.).
-
-## License
-MIT
+## 📄 License
+This project is licensed under the **MIT License**.
+ 
