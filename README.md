@@ -78,7 +78,7 @@ Dataset (N × D)
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/fast-proximity.git
+git clone https://github.com/wexionar/fast-proximity.git
 cd fast-proximity
 
 # Install dependencies
@@ -98,11 +98,11 @@ pip install matplotlib
 
 ```python
 import numpy as np
-from fast_proximity_v3 import FastProximity
+from fast_proximity import FastProximity
 
 # Build index
 np.random.seed(0)
-data = np.random.randn(500_000, 8).astype(np.float32)   # 500k points, 8 dims
+data = np.random.randn(500_000, 8).astype(np.float32)     # 500k points, 8 dims
 engine = FastProximity(data)                              # builds index + JIT warm-up
 
 # Query
@@ -219,12 +219,12 @@ elif N < 5_000 or one-shot query:
 
 ```
 fast-proximity/
-├── fast_proximity_v3.py      # Core engine — FastProximity class + Numba kernel
+├── fast_proximity.py         # Core engine — FastProximity class + Numba kernel
 ├── fast_proximity_test.py    # Full benchmark suite vs cKDTree, KDTree, BallTree
 └── README.md                 # This file
 ```
 
-### `fast_proximity_v3.py`
+### `fast_proximity.py`
 The engine itself. Contains:
 - `_elastic_query_core()` — Numba JIT kernel with max-heap, float64 distances
 - `FastProximity` — Python class with adaptive grid index and warm-up
